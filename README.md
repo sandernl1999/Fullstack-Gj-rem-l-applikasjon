@@ -1,15 +1,18 @@
 ##
-Velkommen til mine ToDo-applikasjon
+Welcome to my ToDo app
 
 ##
-Laget med React, Expo og Firebase.
+Made with React, Expo og Firebase.
 
 ##
-Hvordan sette i gang:
+How to get started
+
+##
+Install node_modules
 
 ##
 expo login
 
 ##
-npm run web eller expo start
+npm run web or expo start
 

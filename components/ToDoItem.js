@@ -1,115 +1,108 @@
-import React, {useState} from "react";
-import { StyleSheet, Text, View, TouchableOpacity, TextInput} from "react-native";
-import Checkbox from "./Checkbox";
+import React, { useState } from "react";
+import { StyleSheet, TouchableOpacity, Platform } from "react-native";
+import { s, vs, ms } from "react-native-size-matters";
+import CheckBox from "./Checkbox";
+import LabeledInput from "./LabeledInput";
+import Texts from "./Texts";
+import Button from "./Button";
+import Wrapper from "./Wrapper";
 import Colors from "../constants/Colors";
-import { ScreenStackHeaderRightView } from "react-native-screens";
 
-const EditableText = ({
-    isChecked,
-    onChangeText,
-    text,
-    isNewItem,
-    ...props
-   }) => {
-
-    const [isEditMode, setEditMode] = useState(props.new);
-
-    return(
-        <TouchableOpacity
-    style={{flex:1}}
-    onPress={() => !isChecked && setEditMode(true)}>
-
-    {isEditMode ? ( 
-    <TextInput
-       underlineColorAndroid={"transparent"}
-       selectionColor={"transparent"}
-       autoFocus={true}
-       value={text}
-       onChangeText={onChangeText}
-       placeholder={"Add"}
-       onSubmitEditing={() => {}}
-       maxLength={30}
-       style={[styles.input, { outline: "none" }]}
-       onBlur={() => {
-           props.onBlur && props.onBlur();
-           setEditMode(false);
-       }}
-       />
-    ) : ( 
-    <Text
-     style={[
-         styles.text,
-         {
-         color: isChecked ?
-         Colors.lightGray : 
-         Colors.black,
-         textDecoration: isChecked ? "line-through" : "none",
-        },
-    ]}
+const EditableText = (props) => {
+  const { isChecked, onChangeText, text, isNewItem, ...rest } = props;
+  const [isEditMode, setEditMode] = useState(props.new);
+  return (
+    <TouchableOpacity
+      style={styles.editableInputStyle}
+      onPress={() => !isChecked && setEditMode(true)}
+      accessible={true}
+      accessibilityLabel="Edit List"
+      accessibilityHint="enter title for edit"
+    >
+      {isEditMode ? (
+        <LabeledInput
+          placeholder="Add"
+          value={text}
+          autoFocus={true}
+          onChangeText={onChangeText}
+          maxLength={30}
+          labelStyle={styles.input}
+          onBlur={() => {
+            rest.onBlur && rest.onBlur();
+            setEditMode(false);
+          }}
+          listInput={true}
+          containerStyle={{ paddingHorizontal: 0, margin: 0, width: "100%" }}
+          accessibilityLabel="Add input"
+          accessibilityHint="Item added with given title"
+        />
+      ) : (
+        <Texts
+          styles={{
+            ...styles.text,
+            color: isChecked ? Colors.lightGray : Colors.black,
+          }}
         >
-        {text}
-        </Text>
-
-    )}
-</TouchableOpacity>
-);
+          {text}
+        </Texts>
+      )}
+    </TouchableOpacity>
+  );
 };
 
-export default ({
-    text,
-    isChecked,
-    onChecked,
-    onChangeText,
-    onDelete,
-    ...props
-}) => {
-
-
-return (
-<View style={styles.container}>
-    <View style={{flexDirection: "row", flex: 1}}>
-    <Checkbox isChecked={isChecked} onChecked={onChecked}/>
-    <EditableText
-    text={text}
-    onChangeText={onChangeText}
-    isChecked={isChecked}
-    {...props}
-    />
-</View>
-  <TouchableOpacity onPress={onDelete}>
-     <Text style={[styles.icon, { color: Colors.red, textAlign: 'right', paddingTop: '1%', marginTop: 10}]}>✂️</Text>
-  </TouchableOpacity>
-</View>
-   );
+const ToDoItem = (props) => {
+  const { text, isChecked, onChecked, onDelete, onChangeText, ...rest } = props;
+  return (
+    <Wrapper style={styles.container}>
+      <CheckBox isChecked={isChecked} onChecked={onChecked} />
+      <EditableText
+        text={text}
+        onChangeText={onChangeText}
+        isChecked={isChecked}
+        {...rest}
+      />
+      <Button
+        otherButtonStyle={{ marginHorizontal: ms(12) }}
+        onPress={onDelete}
+        text={"✂️"}
+        textStyle={styles.icon}
+        accessibilityLabel="Delete button"
+        accessibilityHint="Delete current item"
+      />
+    </Wrapper>
+  );
 };
 
+export default ToDoItem;
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: 10,
-    },
-    icon: {
-        padding: 5,
-        fontSize: 26,
-        marginTop: -37,
-        marginRight: 10,
-    },
-    input: {
-        color: Colors.black,
-        borderBottomColor: Colors.lightGray,
-        borderBottomWidth: 0.5,
-        marginHorizontal: 5,
-        marginTop: 15,
-        padding: 3,
-        height: 45,
-        fontSize: 26,
-    },
-    text: {
-        paddingTop: 4,
-        padding: 3,
-        fontSize: 26,
-    }
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: ms(5),
+    paddingVertical: vs(10),
+  },
+  icon: {
+    fontSize: s(20),
+    textAlign: "right",
+  },
+  input: {
+    color: Colors.black,
+    borderBottomColor: Colors.lightGray,
+    borderBottomWidth: s(0.5),
+    fontSize: Platform.OS === "ios" ? s(15) : s(18),
+    alignItems: "center",
+    width: "100%",
+    flexDirection: "row",
+    height: vs(24),
+  },
+  text: {
+    fontSize: Platform.OS === "ios" ? s(15) : s(18),
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  editableInputStyle: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
 });

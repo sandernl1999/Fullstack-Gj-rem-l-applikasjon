@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from "react";
+import { LogBox } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import Home from "./screens/Home";
-import ToDoList from "./screens/ToDoList";
-import EditList from "./screens/EditList";
-import Login from "./screens/Login";
-import Settings from "./screens/Settings"
-import  Colors  from "./constants/Colors"
 import * as firebase from "firebase";
+import {
+  API_KEY,
+  AUTH_DOMAIN,
+  PROJECT_ID,
+  STORAGE_BUCKET,
+  MESSAGIN_SENDER_ID,
+  APP_ID,
+} from "@env";
+import { Login, Home, ToDoList, EditList, Settings } from "./screens";
+import Colors from "./constants/Colors";
+LogBox.ignoreLogs(["Warning: ..."]);
+LogBox.ignoreAllLogs();
 
 const Stack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -21,39 +28,39 @@ const AuthScreens = () => {
 };
 
 const Screens = () => {
-  return (    
+  return (
     <Stack.Navigator>
-    <Stack.Screen name="My ToDo's🔓" component={Home}/>
-    <Stack.Screen name="Settings" component={Settings}/>
-    <Stack.Screen
-     name="ToDoList"
-     component={ToDoList}
-     options={({ route }) => {
-     return {
-       title: route.params.title,
-       headerStyle: {
-         backgroundColor: route.params.color
-       },
-       headerTintColor: "white"
-     };
-     }}
-     />
-     <Stack.Screen
-      name="Edit"
-      component={EditList}
-      options={({ route }) => {
-        return{
-          title: route.params.title
-          ? `Edit ${route.params.title} list`
-          : "Make new list",
-          headerStyle: {
-            backgroundColor: route.params.color || Colors.blue, 
-          },
-          headerTintColor: "white",
-           };
+      <Stack.Screen name="My ToDo's🔓" component={Home} />
+      <Stack.Screen name="Settings" component={Settings} />
+      <Stack.Screen
+        name="ToDoList"
+        component={ToDoList}
+        options={({ route }) => {
+          return {
+            title: route.params.title,
+            headerStyle: {
+              backgroundColor: route.params.color,
+            },
+            headerTintColor: Colors.white,
+          };
         }}
       />
-  </Stack.Navigator> 
+      <Stack.Screen
+        name="Edit"
+        component={EditList}
+        options={({ route }) => {
+          return {
+            title: route.params.title
+              ? `Edit ${route.params.title} list`
+              : "Make new list",
+            headerStyle: {
+              backgroundColor: route.params.color || Colors.blue,
+            },
+            headerTintColor: Colors.white,
+          };
+        }}
+      />
+    </Stack.Navigator>
   );
 };
 
@@ -66,11 +73,11 @@ export default function App() {
     firebase.auth().onAuthStateChanged((user) => {
       console.log("Checking auth state...");
 
-      if (user) { 
+      if (user) {
         setIsAuthenticated(true);
       } else {
-          setIsAuthenticated(false);
-        }
+        setIsAuthenticated(false);
+      }
     });
   }, []);
 
@@ -81,13 +88,17 @@ export default function App() {
   );
 }
 
-
 const firebaseConfig = {
-  apiKey: "AIzaSyCxf6CraSOTFl0-b042ZyhOxNV2l7Ax2CQ",
-  authDomain: "tema-7-52d24.firebaseapp.com",
-  projectId: "tema-7-52d24",
-  storageBucket: "tema-7-52d24.appspot.com",
-  messagingSenderId: "886542530565",
-  appId: "1:886542530565:web:7931939fdcf2b7ce26446c"
+  apiKey: API_KEY,
+  authDomain: AUTH_DOMAIN,
+  projectId: PROJECT_ID,
+  storageBucket: STORAGE_BUCKET,
+  messagingSenderId: MESSAGIN_SENDER_ID,
+  appId: APP_ID,
 };
-firebase.initializeApp(firebaseConfig);
+// firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+} else {
+  firebase.app(); // if already initialized, use that one
+}
